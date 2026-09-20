@@ -4,13 +4,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schema/user.schema';
 import { isValidObjectId, Model } from 'mongoose';
+import * as bcrypt from "bcrypt"
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) { }
 
   async create(createUserDto: CreateUserDto) {
-    const existingUser = await this.userModel.findOne({email: createUserDto.email})
+    const existingUser = await this.userModel.findOne({email: createUserDto.username})
     if(existingUser) throw new BadRequestException("User already exists")
     const newUser = this.userModel.create(createUserDto)
     return newUser;
@@ -29,6 +30,9 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     if (!isValidObjectId(id)) throw new BadRequestException("Invalid mongo Id")
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10)
+    }
     const findUserAndUpdate = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true })
     if (!findUserAndUpdate) throw new BadRequestException("User not found")
     return findUserAndUpdate;
@@ -38,6 +42,11 @@ export class UsersService {
     if (!isValidObjectId(id)) throw new BadRequestException("Invalid mongo Id")
     const user = await this.userModel.findByIdAndDelete(id)
     if(!user) throw new BadRequestException("User not found")
+    return user;
+  }
+
+  async findUserByUsername(username: string) {
+    const user = this.userModel.findOne({username: username}).select("+password")
     return user;
   }
 }
