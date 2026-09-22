@@ -11,8 +11,8 @@ export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) { }
 
   async create(createUserDto: CreateUserDto) {
-    const existingUser = await this.userModel.findOne({email: createUserDto.username})
-    if(existingUser) throw new BadRequestException("User already exists")
+    const existingUser = await this.userModel.findOne({ email: createUserDto.username })
+    if (existingUser) throw new BadRequestException("User already exists")
     const newUser = this.userModel.create(createUserDto)
     return newUser;
   }
@@ -41,12 +41,26 @@ export class UsersService {
   async remove(id: string) {
     if (!isValidObjectId(id)) throw new BadRequestException("Invalid mongo Id")
     const user = await this.userModel.findByIdAndDelete(id)
-    if(!user) throw new BadRequestException("User not found")
+    if (!user) throw new BadRequestException("User not found")
     return user;
   }
 
   async findUserByUsername(username: string) {
-    const user = this.userModel.findOne({username: username}).select("+password")
+    const user = this.userModel.findOne({ username: username }).select("+password")
     return user;
+  }
+
+  async addImage(userId, imageId) {
+    const updatedUser = await this.userModel.findByIdAndUpdate(userId, { $push: { images: imageId } }, { new: true });
+    return updatedUser;
+  }
+
+  async removeImage(userId, imageId) {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
+      { $pull: { images: imageId } },
+      { new: true },
+    );
+    return updatedUser;
   }
 }

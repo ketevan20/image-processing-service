@@ -18,7 +18,7 @@ export class AwsS3Service {
         })
     }
 
-    async uploadImage(filePath, file) {
+    async uploadImage(filePath, file, contentType?: string) {
         if (!filePath || !file) {
             throw new BadRequestException("filePath and file are required fileds")
         }
@@ -27,12 +27,13 @@ export class AwsS3Service {
                 Body: file,
                 Key: filePath,
                 Bucket: this.bucketName,
+                ContentType: contentType
             };
 
             const command = new PutObjectCommand(config);
             await this.s3.send(command);
 
-            return filePath;
+            return `https://${this.bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${filePath}`;
         } catch (error) {
             throw new BadRequestException('failed to upload image');
         }

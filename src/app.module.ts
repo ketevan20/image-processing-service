@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { AwsS3Module } from './aws-s3/aws-s3.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [ 
@@ -13,7 +14,8 @@ import { AwsS3Module } from './aws-s3/aws-s3.module';
     MongooseModule.forRoot(process.env.MONGO_URI!), 
     UsersModule,
     AuthModule,
-    AwsS3Module
+    AwsS3Module,
+    ImagesModule
   ],
   controllers: [AppController],
   providers: [AppService],
