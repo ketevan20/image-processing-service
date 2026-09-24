@@ -4,13 +4,13 @@ import { Types } from "mongoose";
 @Schema({ timestamps: true })
 export class Image {
   @Prop({ required: true })
-  key!: string; 
+  key!: string;
 
   @Prop({ required: true })
   originalName!: string;
 
-  @Prop({required: true})
-  url!: string; 
+  @Prop({ required: true })
+  url!: string;
 
   @Prop({ required: true })
   mimeType!: string;
@@ -21,8 +21,11 @@ export class Image {
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
   owner!: Types.ObjectId;
 
-  @Prop({ type: [{ key: String, transformations: Object, createdAt: Date }], default: [] })
-  variants!: { key: string; transformations: Record<string, any>; createdAt: Date }[];
+  @Prop({ type: Types.ObjectId, ref: 'Image', default: null })
+  parentImage!: Types.ObjectId | null; 
+
+  @Prop({ type: Object, default: null })
+  transformations!: Record<string, any> | null;
 }
 
 export const ImageSchema = SchemaFactory.createForClass(Image);
