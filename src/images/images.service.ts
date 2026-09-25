@@ -53,7 +53,7 @@ export class ImagesService {
     return image;
   }
 
-  async listImages(ownerId: string, page = 1, limit = 10) {
+  async listImages(ownerId: string, page = 1, limit = 12) {
     const skip = (page - 1) * limit;
 
     const [images, total] = await Promise.all([
@@ -183,7 +183,7 @@ export class ImagesService {
     return newImage;
   }
 
-  async listOriginals(ownerId: string, page = 1, limit = 10) {
+  async listOriginals(ownerId: string, page = 1, limit = 12) {
     const skip = (page - 1) * limit;
     const filter = { owner: ownerId, parentImage: null };
 
@@ -195,7 +195,7 @@ export class ImagesService {
     return { data: images, total, page: Number(page), totalPages: Math.ceil(total / limit) };
   }
 
-  async listTransformed(ownerId: string, page = 1, limit = 10) {
+  async listTransformed(ownerId: string, page = 1, limit = 12) {
     const skip = (page - 1) * limit;
     const filter = { owner: ownerId, parentImage: { $ne: null } };
 

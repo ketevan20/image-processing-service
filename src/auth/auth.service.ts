@@ -19,13 +19,14 @@ export class AuthService {
         const payload = {
             userId: newUser._id
         }
-        const accessToken = await this.jwtService.sign(payload, {expiresIn:"1hr"}) 
+        const accessToken = await this.jwtService.sign(payload, { expiresIn: "1hr" })
 
+        const { password, ...safeUser } = newUser.toObject()
         return {
             message: "User created succesfully",
-            user: newUser,
-            accessToken: accessToken
-        };
+            user: safeUser,
+            accessToken
+        }
     }
 
     async signIn(body: SignInDto) {
@@ -33,14 +34,15 @@ export class AuthService {
         if (!existingUser) throw new BadRequestException("User does not exists")
 
         const isEqualPass = await bcrypt.compare(body.password, existingUser.password)
-        if (!isEqualPass) throw new BadGatewayException("Invalid password")
+        if (!isEqualPass) throw new BadRequestException("Invalid password")
 
         const payload = {
             userId: existingUser._id
         }
 
-        const accessToken = await this.jwtService.sign(payload, {expiresIn:"1hr"}) 
+        const accessToken = await this.jwtService.sign(payload, { expiresIn: "1hr" })
 
-        return accessToken;
+        const { password, ...safeUser } = existingUser.toObject()
+        return { user: safeUser, accessToken }
     }
 }
