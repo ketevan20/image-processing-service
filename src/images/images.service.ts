@@ -102,7 +102,7 @@ export class ImagesService {
     }
 
     const originalBuffer = await this.awsS3Service.getFileBuffer(original.key);
-    let pipeline = sharp(originalBuffer);
+    let pipeline = sharp(originalBuffer).rotate();
 
     if (dto.resize) {
       pipeline = pipeline.resize(dto.resize.width, dto.resize.height);
