@@ -93,6 +93,7 @@ export class ImagesService {
   }
 
   async transformImage(imageId: string, ownerId: string, dto: TransformImageDto) {
+    console.log(dto)
     if (!isValidObjectId(imageId)) throw new BadRequestException();
 
     const original = await this.imageModel.findOne({ _id: imageId });
@@ -170,7 +171,7 @@ export class ImagesService {
     const newImage = await this.imageModel.create({
       key,
       url,
-      originalName: original.originalName,
+      originalName: original.originalName.replace(/\.[^.]+$/, `.${format}`),
       mimeType: `image/${format}`,
       size: transformedBuffer.length,
       owner: ownerId,
