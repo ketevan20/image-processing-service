@@ -207,4 +207,23 @@ export class ImagesService {
 
     return { data: images, total, page: Number(page), totalPages: Math.ceil(total / limit) };
   }
+
+  async bulkDeleteImages(imageIds: string[], ownerId: string) {
+    const images = await this.imageModel.find({ _id: { $in: imageIds } });
+
+    const owned = images.filter((img) => img.owner.toString() === ownerId);
+    const ownedIds = owned.map((img) => img._id.toString());
+    const notFoundOrForbidden = imageIds.filter((id) => !ownedIds.includes(id));
+
+    if (owned.length === 0) {
+      return { deleted: [], failed: notFoundOrForbidden };
+    }
+
+    await this.awsS3Service.deleteFiles(owned.map((img) => img.key));
+
+    await this.imageModel.deleteMany({ _id: { $in: ownedIds } });
+    await this.userService.removeImages(ownerId, ownedIds);
+
+    return { deleted: ownedIds, failed: notFoundOrForbidden };
+  }
 }

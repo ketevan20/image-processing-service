@@ -63,4 +63,8 @@ export class UsersService {
     );
     return updatedUser;
   }
+
+  async removeImages(userId: string, imageIds: string[]) {
+    return this.userModel.findByIdAndUpdate(userId, { $pullAll: { images: imageIds } }, { new: true });
+  }
 }

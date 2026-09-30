@@ -7,6 +7,7 @@ import { ListImagesDto } from './dto/list-images.dto';
 import { TransformImageDto } from './dto/transform-image.dto';
 import { Throttle } from '@nestjs/throttler';
 import { UserThrottlerGuard } from 'src/auth/guards/user-throttler.guard';
+import { BulkDeleteDto } from './dto/bulk-delete.dto';
 
 @UseGuards(AuthGuard)
 @Controller('images')
@@ -37,6 +38,11 @@ export class ImagesController {
   @Get(':id')
   async getOne(@Param('id') id: string, @User() userId) {
     return this.imagesService.getImage(id, userId);
+  }
+
+  @Delete('bulk')
+  async bulkDelete(@Body() dto: BulkDeleteDto, @User() userId) {
+    return this.imagesService.bulkDeleteImages(dto.imageIds, userId);
   }
 
   @Delete(':id')

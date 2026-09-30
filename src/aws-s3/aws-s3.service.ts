@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
 
@@ -90,6 +90,19 @@ export class AwsS3Service {
             await this.s3.send(command);
         } catch (error) {
             throw new BadRequestException('failed to delete image');
+        }
+    }
+
+    async deleteFiles(keys: string[]) {
+        if (!keys.length) return;
+        try {
+            const command = new DeleteObjectsCommand({
+                Bucket: this.bucketName,
+                Delete: { Objects: keys.map((Key) => ({ Key })) },
+            });
+            await this.s3.send(command);
+        } catch (err) {
+            throw new BadRequestException('failed to delete images');
         }
     }
 }
